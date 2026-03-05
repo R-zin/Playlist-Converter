@@ -1,3 +1,4 @@
+import bs4.element
 import httpx
 import asyncio
 from bs4 import BeautifulSoup
@@ -8,6 +9,16 @@ class AppleParser:
     def set_url(self,url):
         self.playlist_url = url
 
+    def parse_raw_to_name(self,arr:bs4.element.ResultSet):
+        res = []
+        for song in arr:
+            url = song['content']
+            name = url.split("/song/")[1].split("/")[0]
+            name = name.replace("-","").title()
+            res.append(name)
+        return res
+
+
     async def parse_playlist_meta(self):
         try:
             async with httpx.AsyncClient(timeout=10) as client:
@@ -16,8 +27,11 @@ class AppleParser:
                 soup = BeautifulSoup(res.text,"html.parser")
                 playlist_name = soup.find("meta",{"name":"apple:title"})['content']
                 song_count = soup.find("meta",{"property":"music:song_count"})['content']
+                song_raw = soup.find_all("meta",{"property":"music:song"})
+                songs = self.parse_raw_to_name(song_raw)
                 print(playlist_name)
                 print(song_count)
+                print(songs)
         except Exception as e:
             print(e.__cause__)
 
