@@ -1,6 +1,8 @@
 import bs4.element
 import httpx
 import asyncio
+from ..models import parsed_music
+import json
 from bs4 import BeautifulSoup
 class AppleParser:
     playlist_url = None
@@ -29,12 +31,17 @@ class AppleParser:
                 song_count = soup.find("meta",{"property":"music:song_count"})['content']
                 song_raw = soup.find_all("meta",{"property":"music:song"})
                 songs = self.parse_raw_to_name(song_raw)
-                print(playlist_name)
-                print(song_count)
-                print(songs)
+                #print(playlist_name)
+                #print(song_count)
+                #print(songs)
+                return parsed_music(playlist_name=playlist_name,
+                                    song_count=int(song_count),
+                                    songs=songs)
         except Exception as e:
             print(e.__cause__)
+
 
 s = AppleParser()
 s.set_url("https://music.apple.com/in/playlist/malayalam-hits/pl.60dd84ecb1e14bf4b4ac9994fb18882f")
 asyncio.run(s.parse_playlist_meta())
+
