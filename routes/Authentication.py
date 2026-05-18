@@ -10,14 +10,15 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/spotify/callback"
 SCOPES = (
-    "playlist-modify-public "
-    "playlist-modify-private "
+    "playlist-modify-public"
+    "playlist-modify-private"
     "user-read-private"
 )
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 
 router = APIRouter()
+@router.post("/login")
 async def spotify_login():
     #Add state paramater with random UUID and store locally (next feature) (Prevents CORS Attack)
     params = {
@@ -36,8 +37,7 @@ async def spotify_login():
 async def spotify_callback(code:str):
     async with httpx.AsyncClient() as client:
         st = CLIENT_ID + ':' + CLIENT_SECRET
-        url_b64_str = base64.urlsafe_b64encode(st.encode()).decode()
-        auth_head = 'Basic ' + url_b64_str
+        auth_head = base64.b64encode(st.encode()).decode()
         response = await client.post(
             SPOTIFY_TOKEN_URL,
             data={
@@ -46,6 +46,11 @@ async def spotify_callback(code:str):
                 "redirect_uri":REDIRECT_URI
             },
             headers={
-                "Authorization": auth_head
+                "Authorization": f"Basic {auth_head}",
+                "content-type": "application/x-www-form-urlencoded"
             }
         )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")

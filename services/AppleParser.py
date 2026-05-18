@@ -20,7 +20,6 @@ class AppleParser:
             res.append(name)
         return res
 
-
     async def parse_playlist_meta(self):
         try:
             async with httpx.AsyncClient(timeout=10) as client:
