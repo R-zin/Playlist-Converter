@@ -1,3 +1,5 @@
+from os import access
+
 from fastapi import APIRouter,HTTPException
 from fastapi.responses import  RedirectResponse
 import httpx
@@ -51,6 +53,10 @@ async def spotify_callback(code:str):
             }
         )
         if response.status_code == 200:
-            return response.json()
+            data = response.json()
+            access_token = data["access_token"]
+
+            frontend_url = f"http://localhost:5173/callback?token={access_token}"
+            return RedirectResponse(frontend_url)
         else:
             raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
