@@ -1,4 +1,3 @@
-from os import access
 
 from fastapi import APIRouter,HTTPException
 from fastapi.responses import  RedirectResponse
@@ -12,8 +11,8 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/spotify/callback"
 SCOPES = (
-    "playlist-modify-public"
-    "playlist-modify-private"
+    "playlist-modify-public "
+    "playlist-modify-private "
     "user-read-private"
 )
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
@@ -55,7 +54,7 @@ async def spotify_callback(code:str):
         if response.status_code == 200:
             data = response.json()
             access_token = data["access_token"]
-
+            refresh_token = data["refresh_token"]
             frontend_url = f"http://localhost:5173/callback?token={access_token}"
             return RedirectResponse(frontend_url)
         else:
