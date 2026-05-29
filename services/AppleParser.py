@@ -20,11 +20,10 @@ class AppleParser:
             res.append(name)
         return res
 
-    async def parse_playlist_meta(self):
+    async def parse_playlist_meta(self,playlist_url:str):
         try:
             async with httpx.AsyncClient(timeout=10) as client:
-                res = await client.get(self.playlist_url,headers={"User-Agent":"Mozilla/5.0"})
-                print(res.text) #test
+                res = await client.get(playlist_url,headers={"User-Agent":"Mozilla/5.0"})
                 soup = BeautifulSoup(res.text,"html.parser")
                 playlist_name = soup.find("meta",{"name":"apple:title"})['content']
                 song_count = soup.find("meta",{"property":"music:song_count"})['content']
