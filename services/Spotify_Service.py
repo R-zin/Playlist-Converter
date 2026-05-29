@@ -1,10 +1,10 @@
-from http.client import HTTPException
+from fastapi import HTTPException
 
 import httpx
 class Spotify:
     def __init__(self):
         pass
-    def check(self,authorization):
+    async def check(self,authorization):
         if not authorization.startswith("Bearer "):
             return False
         access_token = authorization.split(" ")[1]
@@ -24,9 +24,20 @@ class Spotify:
             content = {"name":playlist_name,
                        "description":description,
                        "public":public}
+            headers = {"Authorization" : f"Bearer {token}",
+                       "Content-Type": "application/json"
+                       }
+
             response = await client.post("https://api.spotify.com/v1/me/playlists",
-                                         data=content,
-                                         headers=f"Bearer {token}")
+                                         json=content,
+                                         headers=headers)
+            if response.status_code not in[200.201]:
+                raise HTTPException(status_code=500,detail=response.text)
+            return response.json()
+
+
+
+
 
 
 

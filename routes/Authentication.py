@@ -1,3 +1,4 @@
+from http.client import responses
 from os import access
 
 from fastapi import APIRouter,HTTPException
@@ -66,3 +67,11 @@ async def spotify_callback(code:str,admin:None = Depends(admin_only)):
             return RedirectResponse(frontend_url)
         else:
             raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
+@router.get("/check_token_validity")
+async def check_validity(admin:None = Depends(admin_only)):
+    try:
+        with httpx.Client() as client:
+            header = {
+                "Authorization": f"Bearer {}"
+            }
+            response = client.get("https://api.spotify.com/v1/me",headers=)
