@@ -1,6 +1,6 @@
 on: [push]
 jobs:
-  check-bats-version:
+  FastAPI-Installation:
     runs-on: ubuntu-latest
     steps:
       - name: CheckOut Code
