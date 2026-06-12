@@ -5,13 +5,13 @@ from ..models import parsed_music
 import json
 from bs4 import BeautifulSoup
 class AppleParser:
-    playlist_url = None
+
     def __init__(self):
         pass
     def set_url(self,url):
         self.playlist_url = url
 
-    def parse_raw_to_name(self,arr:bs4.element.ResultSet):
+    async def parse_raw_to_name(self,arr:bs4.element.ResultSet):
         res = []
         for song in arr:
             url = song['content']
@@ -28,7 +28,7 @@ class AppleParser:
                 playlist_name = soup.find("meta",{"name":"apple:title"})['content']
                 song_count = soup.find("meta",{"property":"music:song_count"})['content']
                 song_raw = soup.find_all("meta",{"property":"music:song"})
-                songs = self.parse_raw_to_name(song_raw)
+                songs = await self.parse_raw_to_name(song_raw)
                 #print(playlist_name)
                 #print(song_count)
                 #print(songs)
@@ -37,6 +37,7 @@ class AppleParser:
                                     songs=songs)
         except Exception as e:
             print(e.__cause__)
+            return None
 
 
 s = AppleParser()

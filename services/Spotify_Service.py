@@ -1,10 +1,10 @@
 from http.client import HTTPException
-
+from typing import List
 import httpx
 class Spotify:
     def __init__(self):
         pass
-    def check(self,authorization):
+    async def check(self,authorization):
         if not authorization.startswith("Bearer "):
             return False
         access_token = authorization.split(" ")[1]
@@ -19,7 +19,7 @@ class Spotify:
             else:
                 return True
 
-    async def create_playlist(self,token:str,playlist_name:str,description:str,public:bool):
+    async def create_playlist(self,token:str,playlist_name:str,description:str,public:bool,songs:List[str]):
         async with httpx.AsyncClient() as client:
             content = {"name":playlist_name,
                        "description":description,
@@ -27,6 +27,10 @@ class Spotify:
             response = await client.post("https://api.spotify.com/v1/me/playlists",
                                          data=content,
                                          headers=f"Bearer {token}")
+            url = response["external_urls"]["spotify"]
+            playlist_id = response["id"]
+            for i in songs:
+                song =
 
 
 
