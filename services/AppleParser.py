@@ -8,9 +8,6 @@ class AppleParser:
 
     def __init__(self):
         pass
-    def set_url(self,url):
-        self.playlist_url = url
-
     async def parse_raw_to_name(self,arr:bs4.element.ResultSet):
         res = []
         for song in arr:
@@ -40,7 +37,5 @@ class AppleParser:
             return None
 
 
-s = AppleParser()
-s.set_url("https://music.apple.com/in/playlist/malayalam-hits/pl.60dd84ecb1e14bf4b4ac9994fb18882f")
-asyncio.run(s.parse_playlist_meta())
+
 
