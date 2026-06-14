@@ -1,4 +1,6 @@
 from http.client import HTTPException
+from wsgiref import headers
+from rapidfuzz import process
 from typing import List
 import httpx
 class Spotify:
@@ -18,6 +20,29 @@ class Spotify:
                 return False
             else:
                 return True
+    async def best_one(self,target,query:dict):
+        q = query.keys()
+        best = process.extractOne(target,q)
+        return query[best[0]]
+
+    async def find_song(self,name: str):
+        res = {}
+        async with httpx.AsyncClient() as client:
+            payload = {
+                "q":name,
+                "type":"track",
+                "limit":10
+            }
+            response = await client.get("https://api.spotify.com/v1/search",headers=headers,params=payload)
+            if response.status_code == 200:
+                for i in response.json()["tracks"]["items"]:
+                    res[i["name"]] = i["uri"]
+
+
+
+
+
+
 
     async def create_playlist(self,token:str,playlist_name:str,description:str,public:bool,songs:List[str]):
         async with httpx.AsyncClient() as client:
