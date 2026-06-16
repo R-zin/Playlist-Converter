@@ -23,4 +23,10 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install uvicorn
       - name: Running FastAPI Server
-        run: uvicorn main:app
+        run: |
+          source .venv/bin/activate
+          uvicorn main:app &
+          SERVER_PID=$!
+          sleep 5
+          kill $SERVER_PID
+        
