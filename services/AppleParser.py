@@ -1,7 +1,7 @@
 import bs4.element
 import httpx
 import asyncio
-from ..models import parsed_music
+from models import parsed_music
 import json
 from bs4 import BeautifulSoup
 class AppleParser:

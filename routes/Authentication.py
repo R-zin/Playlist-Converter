@@ -1,25 +1,27 @@
 
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException,Depends
+from fastapi.security import OAuth2AuthorizationCodeBearer
 from fastapi.responses import  RedirectResponse
 import httpx
 import os
 import base64
 import urllib.parse
 from uuid import uuid4
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:8000/spotify/callback"
-SCOPES = (
-    "playlist-modify-public "
-    "playlist-modify-private "
-    "user-read-private"
-)
+REDIRECT_URI = "http://localhost:8000/callback"
+SCOPES = {
+    "playlist-modify-public":"Modify playlist",
+    "playlist-modify-private": "modify private playlist",
+    "user-read-private":"Read private playlist"
+}
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
+oauth_scheme = OAuth2AuthorizationCodeBearer(SPOTIFY_AUTH_URL,SPOTIFY_TOKEN_URL,scopes=SCOPES)
 
 router = APIRouter()
-@router.post("/login")
+@router.get("/login")
 async def spotify_login():
     #Add state paramater with random UUID and store locally (next feature) (Prevents CORS Attack)
     params = {
@@ -56,6 +58,10 @@ async def spotify_callback(code:str):
             access_token = data["access_token"]
             refresh_token = data["refresh_token"]
             frontend_url = f"http://localhost:5173/callback?token={access_token}"
-            return RedirectResponse(frontend_url)
+            return data #for testing only
+            #return RedirectResponse(frontend_url)
         else:
             raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
+@router.get("/protected-profile")
+async def get_profile(token: str = Depends(oauth_scheme)):
+    return {"message": "You are authenticated!", "token": token}

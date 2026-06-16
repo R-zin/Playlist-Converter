@@ -1,7 +1,7 @@
 from fastapi import APIRouter,HTTPException,Header
-from ..services.Spotify_Service import Spotify
-from ..services.logger import log_playlist
-from ..services.AppleParser import AppleParser
+from services.Spotify_Service import Spotify
+#from ..services.logger import log_playlist
+from services.AppleParser import AppleParser
 import asyncio
 
 spotify = Spotify()

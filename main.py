@@ -1,10 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from routes.Authentication import router as auth_router
+from routes.Converter import router as converter
 app = FastAPI(title="Song Parser")
 
-app.add_middleware(CORSMiddleware,
-                   allow_orgins=["*"],
-                   allow_credentials=True,
-                   allow_methods=["*"],
-                   allow_headers=["*"])
+app.include_router(auth_router)
+app.include_router(converter)
