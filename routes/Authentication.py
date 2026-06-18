@@ -3,6 +3,8 @@ from fastapi import APIRouter,HTTPException,Depends,Header
 from fastapi.params import Header
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from fastapi.responses import  RedirectResponse
+from services.database import SessionLocal
+from services.dbmodel import SpotifyAdmin
 import httpx
 import os
 import base64
@@ -34,7 +36,7 @@ async def spotify_login(admin:bool = Depends(verify_admin)):
         "client_id":CLIENT_ID,
         "response_type":"code",
         "redirect_uri":REDIRECT_URI,
-        "scope":SCOPES
+        "scope":" ".join(SCOPES.keys())
     }
     auth_url = (
         f"{SPOTIFY_AUTH_URL}?"
@@ -45,26 +47,36 @@ async def spotify_login(admin:bool = Depends(verify_admin)):
 @router.get("/callback")
 async def spotify_callback(code:str,admin:bool = Depends(verify_admin)):
     async with httpx.AsyncClient() as client:
-        st = CLIENT_ID + ':' + CLIENT_SECRET
-        auth_head = base64.b64encode(st.encode()).decode()
-        response = await client.post(
-            SPOTIFY_TOKEN_URL,
-            data={
-                "grant_type":"authorization_code",
-                "code":code,
-                "redirect_uri":REDIRECT_URI
-            },
-            headers={
-                "Authorization": f"Basic {auth_head}",
-                "content-type": "application/x-www-form-urlencoded"
-            }
-        )
-        if response.status_code == 200:
-            data = response.json()
-            access_token = data["access_token"]
-            refresh_token = data["refresh_token"]
-            frontend_url = f"http://localhost:5173/callback?token={access_token}"
-            return data #for testing only
+        try:
+            st = CLIENT_ID + ':' + CLIENT_SECRET
+            auth_head = base64.b64encode(st.encode()).decode()
+            response = await client.post(
+                SPOTIFY_TOKEN_URL,
+                data={
+                    "grant_type":"authorization_code",
+                    "code":code,
+                    "redirect_uri":REDIRECT_URI
+                },
+                headers={
+                    "Authorization": f"Basic {auth_head}",
+                    "content-type": "application/x-www-form-urlencoded"
+                }
+            )
+            if response.status_code == 200:
+                data = response.json()
+                access_token = data["access_token"]
+                refresh_token = data["refresh_token"]
+                db = SessionLocal()
+                admin = db.query(SpotifyAdmin).filter(SpotifyAdmin.id == 1).first()
+                if admin:
+                    admin.refresh_token = refresh_token
+                else:
+                    admin = SpotifyAdmin(id=1,refresh_token=refresh_token)
+                    db.add(admin)
+                db.commit()
+                db.close()
             #return RedirectResponse(frontend_url)
-        else:
-            raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
+            else:
+                raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
+        except Exception as e:
+            raise HTTPException(status_code=401,detail=f"access token invalid {e}")
