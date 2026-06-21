@@ -3,15 +3,15 @@ from fastapi import APIRouter,HTTPException,Depends,Header
 from fastapi.params import Header
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from fastapi.responses import  RedirectResponse
-from services.database import SessionLocal
-from services.dbmodel import SpotifyAdmin
+#from services.database import SessionLocal
+#from services.dbmodel import SpotifyAdmin
 import httpx
 import os
 import base64
 import urllib.parse
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:8000/callback"
+REDIRECT_URI = "http://127.0.0.1:8000/callback"
 SCOPES = {
     "playlist-modify-public":"Modify playlist",
     "playlist-modify-private": "modify private playlist",
@@ -42,10 +42,13 @@ async def spotify_login(admin:bool = Depends(verify_admin)):
         f"{SPOTIFY_AUTH_URL}?"
         f"{urllib.parse.urlencode(params)}"
     )
-    return RedirectResponse(auth_url)
+    #return RedirectResponse(auth_url)
+    return {
+        "authorization_url":auth_url
+    }
 
 @router.get("/callback")
-async def spotify_callback(code:str,admin:bool = Depends(verify_admin)):
+async def spotify_callback(code:str):
     async with httpx.AsyncClient() as client:
         try:
             st = CLIENT_ID + ':' + CLIENT_SECRET
@@ -66,17 +69,8 @@ async def spotify_callback(code:str,admin:bool = Depends(verify_admin)):
                 data = response.json()
                 access_token = data["access_token"]
                 refresh_token = data["refresh_token"]
-                db = SessionLocal()
-                admin = db.query(SpotifyAdmin).filter(SpotifyAdmin.id == 1).first()
-                if admin:
-                    admin.refresh_token = refresh_token
-                else:
-                    admin = SpotifyAdmin(id=1,refresh_token=refresh_token)
-                    db.add(admin)
-                db.commit()
-                db.close()
-            #return RedirectResponse(frontend_url)
-            else:
-                raise HTTPException(status_code=401,detail=f"access token invalid  unauthorized/expired {response}")
+                return {"access_token":access_token,
+                        "refresh_token":refresh_token}
         except Exception as e:
-            raise HTTPException(status_code=401,detail=f"access token invalid {e}")
+            raise HTTPException(status_code=400,detail=str(e))
+
