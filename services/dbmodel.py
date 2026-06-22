@@ -1,11 +1,14 @@
-from sqlalchemy import Column, Integer, Text, String, ARRAY
+
+
+from sqlalchemy import Column, Integer, Text, String, ARRAY,DateTime
 from database import Base
 
 class SpotifyAdmin(Base):
     __tablename__ = "spotify_admin"
     id = Column(Integer,primary_key=True)
+    access_token = Column(Text,nullable=False)
     refresh_token = Column(Text,nullable=False)
-    spotify_user_id = Column(Text,nullable=False)
+    expires_at = Column(DateTime)
 class SpotifyPlaylist(Base):
     __tablename__ = "spotify_playlist"
     id = Column(String,primary_key=True)
