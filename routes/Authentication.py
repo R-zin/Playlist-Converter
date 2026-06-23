@@ -3,8 +3,9 @@ from fastapi import APIRouter,HTTPException,Depends,Header
 from fastapi.params import Header
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from fastapi.responses import  RedirectResponse
-#from services.database import SessionLocal
-#from services.dbmodel import SpotifyAdmin
+from services.database import SessionLocal
+from uuid import uuid4
+from services.dbmodel import SpotifyAdmin
 import httpx
 import os
 import base64
@@ -69,8 +70,15 @@ async def spotify_callback(code:str):
                 data = response.json()
                 access_token = data["access_token"]
                 refresh_token = data["refresh_token"]
+                expires_in = data["expires_in"]
+                s = SessionLocal()
+                admin = SpotifyAdmin(str(uuid4()),access_token,refresh_token,expires_in)
+                s.add(admin)
+                s.commit()
+                s.refresh(admin)
                 return {"access_token":access_token,
-                        "refresh_token":refresh_token}
+                        "refresh_token":refresh_token,
+                        "expires_in":expires_in}
         except Exception as e:
             raise HTTPException(status_code=400,detail=str(e))
 

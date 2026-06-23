@@ -5,7 +5,7 @@ from database import Base
 
 class SpotifyAdmin(Base):
     __tablename__ = "spotify_admin"
-    id = Column(Integer,primary_key=True)
+    id = Column(String,primary_key=True,)
     access_token = Column(Text,nullable=False)
     refresh_token = Column(Text,nullable=False)
     expires_at = Column(DateTime)
