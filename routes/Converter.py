@@ -4,6 +4,7 @@ from services.Spotify_Service import Spotify
 from services.AppleParser import AppleParser
 #from services.database import SessionLocal
 #from services.dbmodel import SpotifyPlaylist
+from services.redis_file import client
 import asyncio
 
 spotify = Spotify()
