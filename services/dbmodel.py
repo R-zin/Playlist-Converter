@@ -1,7 +1,7 @@
 
 
 from sqlalchemy import Column, Integer, Text, String, ARRAY,DateTime
-from database import Base
+from services.database import Base
 
 class SpotifyAdmin(Base):
     __tablename__ = "spotify_admin"

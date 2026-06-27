@@ -1,5 +1,4 @@
 import asyncio
-from http.client import HTTPException
 from rapidfuzz import process
 from typing import List
 import httpx
@@ -50,7 +49,7 @@ class Spotify:
 
     async def add_tracks_to_playlist(self,headers:dict,uri_list:List[str],playlist_id:str):
 
-        respnose = httpx.Client().get(f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
+        response = httpx.Client().get(f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
                                       headers=headers,params={"uris":uri_list})
 
 
@@ -67,7 +66,7 @@ class Spotify:
             response = await client.post("https://api.spotify.com/v1/me/playlists",
                                          data=content,
                                          headers=f"Bearer {token}")
-            url = response.jspn()["external_urls"]["spotify"]
+            url = response.json()["external_urls"]["spotify"]
             playlist_id = response.json()["id"]
             batches = [song_uris[i:i+100] for i in range(0, len(song_uris), 100)]
 
