@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.Authentication import router as auth_router
 from routes.Converter import router as converter
+from dotenv import load_dotenv
+
+load_dotenv()
 app = FastAPI(title="Song Parser")
 
 app.include_router(auth_router)
