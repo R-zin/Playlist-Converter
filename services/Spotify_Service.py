@@ -53,16 +53,13 @@ class Spotify:
                                       headers=headers,params={"uris":uri_list})
 
 
-
-
-
-    async def create_playlist(self,token:str,playlist_name:str,description:str,public:bool,songs:List[str]):
+    async def create_playlist(self,token:str,playlist_name:str,description:str,songs:List[str]):
         headers = {"Authorization":f"Bearer {token}"}
         song_uris = await self.search_songs_parellel(songs,token)
         async with httpx.AsyncClient() as client:
             content = {"name":playlist_name,
                        "description":description,
-                       "public":public}
+                       "public":True}
             response = await client.post("https://api.spotify.com/v1/me/playlists",
                                          data=content,
                                          headers=f"Bearer {token}")

@@ -18,7 +18,8 @@ async def convert(apple_music_playlist_url:str,playlist_name:str,authorization:s
         apple_playlist = asyncio.run(appleParser.parse_playlist_meta(apple_music_playlist_url))
         if not apple_playlist:
             raise Exception
-        res = await spotify.create_playlist(apple_playlist.songs)
+        #token = db.query()
+        res = await spotify.create_playlist(token=token,playlist_name=playlist_name,songs=apple_playlist)
         entry = SpotifyPlaylist(playlist_name=playlist_name,trackno=len(apple_playlist.songs),playlist_link=res,song_list=apple_playlist.songs)
         db.add(entry)
         db.commit()

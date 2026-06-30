@@ -4,3 +4,5 @@ rapidfuzz
 httpx
 os
 psycopg2
+
+python-dotenv

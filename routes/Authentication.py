@@ -34,10 +34,10 @@ router = APIRouter()
 async def spotify_login(admin:bool = Depends(verify_admin)):
     #Add state paramater with random UUID and store locally (next feature) (Prevents CORS Attack)
     params = {
-        "client_id":CLIENT_ID,
-        "response_type":"code",
-        "redirect_uri":REDIRECT_URI,
-        "scope":" ".join(SCOPES.keys())
+        "response_type": 'code',
+      "client_id": CLIENT_ID,
+      "scope": " ".join(SCOPES.keys()),
+      "redirect_uri": REDIRECT_URI,
     }
     auth_url = (
         f"{SPOTIFY_AUTH_URL}?"
@@ -50,6 +50,7 @@ async def spotify_login(admin:bool = Depends(verify_admin)):
 
 @router.get("/callback")
 async def spotify_callback(code:str):
+    print(code)
     async with httpx.AsyncClient() as client:
         try:
             st = CLIENT_ID + ':' + CLIENT_SECRET
@@ -72,7 +73,12 @@ async def spotify_callback(code:str):
                 refresh_token = data["refresh_token"]
                 expires_in = data["expires_in"]
                 s = SessionLocal()
-                admin = SpotifyAdmin(str(uuid4()),access_token,refresh_token,expires_in)
+                admin = SpotifyAdmin(
+                    id=str(uuid4()),
+                    access_token=access_token,
+                    refresh_token=refresh_token,
+                    expires_at=expires_in,
+                )
                 s.add(admin)
                 s.commit()
                 s.refresh(admin)
