@@ -8,7 +8,7 @@ class SpotifyAdmin(Base):
     id = Column(String,primary_key=True,)
     access_token = Column(Text,nullable=False)
     refresh_token = Column(Text,nullable=False)
-    expires_at = Column(DateTime)
+    expires_at = Column(DateTime,nullable=False)
 class SpotifyPlaylist(Base):
     __tablename__ = "spotify_playlist"
     id = Column(String,primary_key=True)

@@ -2,7 +2,7 @@
 from fastapi import APIRouter,HTTPException,Depends,Header
 from fastapi.params import Header
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from fastapi.responses import  RedirectResponse
+from datetime import datetime, timedelta
 from services.database import SessionLocal
 from uuid import uuid4
 from services.dbmodel import SpotifyAdmin
@@ -77,7 +77,7 @@ async def spotify_callback(code:str):
                     id=str(uuid4()),
                     access_token=access_token,
                     refresh_token=refresh_token,
-                    expires_at=expires_in,
+                    expires_at=datetime.now() + timedelta(seconds=expires_in),
                 )
                 s.add(admin)
                 s.commit()
