@@ -10,3 +10,7 @@ app = FastAPI(title="Song Parser")
 
 app.include_router(auth_router)
 app.include_router(converter)
+
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "ok"}

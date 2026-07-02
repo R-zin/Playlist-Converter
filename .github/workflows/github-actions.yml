@@ -22,11 +22,17 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install uvicorn
-      - name: Running FastAPI Server
+      - name: Run FastAPI server and test health endpoint
         run: |
           source .venv/bin/activate
-          uvicorn main:app &
+
+          uvicorn main:app --host 127.0.0.1 --port 8000 &
           SERVER_PID=$!
+
+          # Wait for server to start
           sleep 5
+
+          # Fail the workflow if /health doesn't return a 2xx response
+          curl --fail http://127.0.0.1:8000/health
+
           kill $SERVER_PID
-        
