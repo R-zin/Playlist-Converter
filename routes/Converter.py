@@ -34,9 +34,10 @@ async def get_new_access_token(refresh_token:str):
 
 
 @router.post("/convert/apple-music-to-spotify")
-async def convert(apple_music_playlist_url:str,playlist_name:str,authorization:str = Header()):
+async def convert(apple_music_playlist_url:str,playlist_name:str,description:str):
     try:
         apple_playlist = await appleParser.parse_playlist_meta(apple_music_playlist_url)
+        print(apple_playlist.songs)
         if not apple_playlist:
             raise Exception
         admin = db.query(SpotifyAdmin).first()
@@ -50,8 +51,7 @@ async def convert(apple_music_playlist_url:str,playlist_name:str,authorization:s
             db.commit()
         else:
             token = admin.access_token
-
-        res = await spotify.create_playlist(token=token,playlist_name=playlist_name,songs=apple_playlist)
+        res = await spotify.create_playlist(token=token,playlist_name=playlist_name,songs=apple_playlist,description=description)
         entry = SpotifyPlaylist(playlist_name=playlist_name,trackno=len(apple_playlist.songs),playlist_link=res,song_list=apple_playlist.songs)
         db.add(entry)
         db.commit()
@@ -60,7 +60,7 @@ async def convert(apple_music_playlist_url:str,playlist_name:str,authorization:s
             "playlist_url":res
         }
     except Exception as e:
-        raise HTTPException(status_code=500,detail=str(e))
+        raise HTTPException(status_code=500,detail=e)
 
 
 
