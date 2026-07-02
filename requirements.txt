@@ -2,7 +2,5 @@ fastapi
 bs4
 rapidfuzz
 httpx
-os
 psycopg2
-
 python-dotenv
