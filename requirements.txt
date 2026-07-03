@@ -4,3 +4,4 @@ rapidfuzz
 httpx
 psycopg2
 python-dotenv
+sqlalchemy
