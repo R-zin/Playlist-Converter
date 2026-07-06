@@ -1,6 +1,5 @@
-from fastapi import APIRouter,HTTPException,Header
-from sqlalchemy import null
-
+from fastapi import APIRouter,HTTPException,Depends
+from sqlalchemy.orm import Session
 from routes.Authentication import CLIENT_ID,CLIENT_SECRET
 from services.Spotify_Service import Spotify
 #from ..services.logger import log_playlist
@@ -17,9 +16,15 @@ import asyncio
 spotify = Spotify()
 appleParser = AppleParser()
 router = APIRouter()
-db = SessionLocal()
 st = CLIENT_ID + ':' + CLIENT_SECRET
 auth_head = base64.b64encode(st.encode()).decode()
+
+def db_connect():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 async def get_new_access_token(refresh_token:str):
 
@@ -28,34 +33,29 @@ async def get_new_access_token(refresh_token:str):
             res = await client.post(
                 "https://accounts.spotify.com/api/token",
                 headers={"Content-Type": "application/x-www-form-urlencoded",
-                         "Authorization": f"Bearer {auth_head}"},
+                         "Authorization": f"Basic {auth_head}"},
                 data={"grant_type": "refresh_token",
-                      "refresh_token": refresh_token, }
+                      "refresh_token": refresh_token }
             )
+            print(res.text)
             if res.status_code == 200:
                 return res.json()["access_token"]
     except Exception as e:
         raise HTTPException(status_code=404,detail=e)
 
 
-
-
-
-
-
 @router.post("/convert/apple-music-to-spotify")
-async def convert(apple_music_playlist_url:str,playlist_name:str,description:str):
+async def convert(apple_music_playlist_url:str,playlist_name:str,description:str,db: Session = Depends(db_connect)):
     try:
         apple_playlist = await appleParser.parse_playlist_meta(apple_music_playlist_url)
         print(apple_playlist.songs)
-        if not apple_playlist:
-            raise Exception
         admin = db.query(SpotifyAdmin).first()
+        print(admin)
         if not admin:
             raise HTTPException(status_code=404,detail="Admin not found")
         token = None
         if datetime.now() >= admin.expires_at:
-            token = await get_new_access_token(admin.refresh_token)
+            token = await get_new_access_token(str(admin.refresh_token))
             admin.access_token = token
             admin.expires_at = datetime.now() + timedelta(seconds=3600)
             db.commit()
