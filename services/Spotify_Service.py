@@ -46,6 +46,7 @@ class Spotify:
         results = await asyncio.gather(*tasks,return_exceptions=True)
         song_uri = []
         for name,result in zip(song_names,results):
+            print(result)
             best_uri = await self.best_one(name,result)
             song_uri.append(best_uri)
         return song_uri
@@ -53,7 +54,7 @@ class Spotify:
     async def add_tracks_to_playlist(self,headers:dict,uri_list:List[str],playlist_id:str):
 
         async with httpx.AsyncClient() as client:
-            response = client.post(f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
+            response = await client.post(f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
                                           headers=headers, json={"uris":uri_list})
 
 

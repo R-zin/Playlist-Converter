@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Playlist-Converter.iml" filepath="$PROJECT_DIR$/.idea/Playlist-Converter.iml" />
+      <module fileurl="file://$USER_HOME$/Downloads/cubicasa-parser-2/.idea/cubicasa-parser-2.iml" filepath="$USER_HOME$/Downloads/cubicasa-parser-2/.idea/cubicasa-parser-2.iml" />
     </modules>
   </component>
 </project>
