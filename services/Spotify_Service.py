@@ -22,6 +22,11 @@ class Spotify:
     async def best_one(self,target,query:dict):
         if not query:
             return None
+        print(type(target), target)
+        print(type(query), query)
+
+        for k in query.keys():
+            print(type(k), k)
         best = process.extractOne(target,tuple(query.keys()))
         if not best:
             return None
