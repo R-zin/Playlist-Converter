@@ -12,7 +12,7 @@ import base64
 import urllib.parse
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/callback"
+REDIRECT_URI = os.getenv("REDIRECT_URI")
 SCOPES = {
     "playlist-modify-public":"Modify playlist",
     "playlist-modify-private": "modify private playlist",
