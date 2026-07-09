@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from fastapi import APIRouter,HTTPException,Depends
 from sqlalchemy.orm import Session
 from routes.Authentication import CLIENT_ID,CLIENT_SECRET
@@ -48,9 +50,7 @@ async def get_new_access_token(refresh_token:str):
 async def convert(apple_music_playlist_url:str,playlist_name:str,description:str,db: Session = Depends(db_connect)):
     try:
         apple_playlist = await appleParser.parse_playlist_meta(apple_music_playlist_url)
-        print(apple_playlist.songs)
         admin = db.query(SpotifyAdmin).first()
-        print(admin)
         if not admin:
             raise HTTPException(status_code=404,detail="Admin not found")
         token = None
@@ -61,8 +61,8 @@ async def convert(apple_music_playlist_url:str,playlist_name:str,description:str
             db.commit()
         else:
             token = admin.access_token
-        res = await spotify.create_playlist(token=str(token),playlist_name=playlist_name,songs=apple_playlist,description=description)
-        entry = SpotifyPlaylist(playlist_name=playlist_name,trackno=len(apple_playlist.songs),playlist_link=res,song_list=apple_playlist.songs)
+        res = await spotify.create_playlist(token=str(token),playlist_name=playlist_name,songs=apple_playlist.songs,description=description)
+        entry = SpotifyPlaylist(id=str(uuid4()),playlist_name=playlist_name,trackno=len(apple_playlist.songs),playlist_link=res,song_list=apple_playlist.songs)
         db.add(entry)
         db.commit()
         db.refresh(entry)

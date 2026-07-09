@@ -22,12 +22,8 @@ class Spotify:
     async def best_one(self,target,query:dict):
         if not query:
             return None
-        print(type(target), target)
-        print(type(query), query)
-
         for k in query.keys():
-            print(type(k), k)
-        best = process.extractOne(target,tuple(query.keys()))
+             best = process.extractOne(target,tuple(query.keys()))
         if not best:
             return None
         return query[best[0]]
@@ -51,7 +47,6 @@ class Spotify:
         results = await asyncio.gather(*tasks,return_exceptions=True)
         song_uri = []
         for name,result in zip(song_names,results):
-            print(result)
             best_uri = await self.best_one(name,result)
             song_uri.append(best_uri)
         return song_uri
