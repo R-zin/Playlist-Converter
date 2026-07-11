@@ -1,5 +1,5 @@
 from uuid import uuid4
-
+from celery.result import AsyncResult
 from fastapi import APIRouter,HTTPException,Depends
 from sqlalchemy.orm import Session
 from routes.Authentication import CLIENT_ID,CLIENT_SECRET
@@ -29,7 +29,6 @@ def db_connect():
         db.close()
 
 async def get_new_access_token(refresh_token:str):
-
     try:
         async with httpx.AsyncClient() as client:
             res = await client.post(
@@ -71,6 +70,17 @@ async def convert(apple_music_playlist_url:str,playlist_name:str,description:str
         }
     except Exception as e:
         raise HTTPException(status_code=500,detail=e)
+
+
+
+@router.get("/status/{task_id")
+def get_status(task_id:str):
+    task = AsyncResult(task_id)
+
+    return {
+        "state":task.state,
+        "result":task.result,
+    }
 
 
 
