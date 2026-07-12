@@ -1,6 +1,7 @@
 from uuid import uuid4
 from celery.result import AsyncResult
 from fastapi import APIRouter,HTTPException,Depends
+from services.tasks import convert
 from sqlalchemy.orm import Session
 from routes.Authentication import CLIENT_ID,CLIENT_SECRET
 from services.Spotify_Service import Spotify
@@ -46,27 +47,12 @@ async def get_new_access_token(refresh_token:str):
 
 
 @router.post("/convert/apple-music-to-spotify")
-async def convert(apple_music_playlist_url:str,playlist_name:str,description:str,db: Session = Depends(db_connect)):
+async def convert_playlist(apple_music_playlist_url:str,playlist_name:str,description:str):
     try:
-        apple_playlist = await appleParser.parse_playlist_meta(apple_music_playlist_url)
-        admin = db.query(SpotifyAdmin).first()
-        if not admin:
-            raise HTTPException(status_code=404,detail="Admin not found")
-        token = None
-        if datetime.now() >= admin.expires_at:
-            token = await get_new_access_token(str(admin.refresh_token))
-            admin.access_token = token
-            admin.expires_at = datetime.now() + timedelta(seconds=3600)
-            db.commit()
-        else:
-            token = admin.access_token
-        res = await spotify.create_playlist(token=str(token),playlist_name=playlist_name,songs=apple_playlist.songs,description=description)
-        entry = SpotifyPlaylist(id=str(uuid4()),playlist_name=playlist_name,trackno=len(apple_playlist.songs),playlist_link=res,song_list=apple_playlist.songs)
-        db.add(entry)
-        db.commit()
-        db.refresh(entry)
+        task = convert.delay(apple_music_playlist_url,playlist_name,description)
         return {
-            "playlist_url":res
+            "task_id":task.id,
+            "status":"PENDING"
         }
     except Exception as e:
         raise HTTPException(status_code=500,detail=e)
