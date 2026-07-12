@@ -1,20 +1,13 @@
-from uuid import uuid4
 from celery.result import AsyncResult
-from fastapi import APIRouter,HTTPException,Depends
+from fastapi import APIRouter,HTTPException
 from services.tasks import convert
-from sqlalchemy.orm import Session
 from routes.Authentication import CLIENT_ID,CLIENT_SECRET
 from services.Spotify_Service import Spotify
 #from ..services.logger import log_playlist
 from services.AppleParser import AppleParser
 from services.database import SessionLocal
-from services.dbmodel import SpotifyPlaylist
 import httpx
 import base64
-from services.redis_file import client
-from datetime import datetime, timedelta
-from services.dbmodel import SpotifyAdmin
-import asyncio
 
 spotify = Spotify()
 appleParser = AppleParser()
