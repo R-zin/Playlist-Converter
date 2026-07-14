@@ -14,13 +14,11 @@ import asyncio
 
 spotify = Spotify()
 appleParser = AppleParser()
-db = SessionLocal()
 
 st = CLIENT_ID + ':' + CLIENT_SECRET
 auth_head = base64.b64encode(st.encode()).decode()
 
 async def get_new_access_token(refresh_token:str):
-
     try:
         async with httpx.AsyncClient() as client:
             res = client.post(
@@ -37,6 +35,7 @@ async def get_new_access_token(refresh_token:str):
         raise HTTPException(status_code=404,detail=e)
 
 async def convert_playlist_async(apple_music_playlist_url:str,playlist_name:str,description:str):
+    db = SessionLocal()
     try:
         apple_playlist = appleParser.parse_playlist_meta(apple_music_playlist_url)
         admin = db.query(SpotifyAdmin).first()
@@ -62,6 +61,8 @@ async def convert_playlist_async(apple_music_playlist_url:str,playlist_name:str,
         }
     except Exception as e:
         raise HTTPException(status_code=404,detail=e)
+    finally:
+        db.close()
 
 @celery.task()
 def convert(apple_music_playlist_url,playlist_name,description):
