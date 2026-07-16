@@ -1,4 +1,3 @@
-import httpx
 from uuid import uuid4
 import base64
 from services.celery_app import celery
@@ -21,7 +20,7 @@ auth_head = base64.b64encode(st.encode()).decode()
 async def get_new_access_token(refresh_token:str):
     try:
         async with httpx.AsyncClient() as client:
-            res = client.post(
+            res = await client.post(
                 "https://accounts.spotify.com/api/token",
                 headers={"Content-Type": "application/x-www-form-urlencoded",
                          "Authorization": f"Basic {auth_head}"},

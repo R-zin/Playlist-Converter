@@ -1,9 +1,11 @@
 from celery import Celery
 import os
-
+from dotenv import load_dotenv
+load_dotenv("../.env")
 REDIS_URL = os.getenv("REDIS_URL")
 
 
+app = Celery("celery_app")
 celery = Celery('Playlist_converter',
                     broker=REDIS_URL,
                     backend=REDIS_URL,)

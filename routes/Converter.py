@@ -52,9 +52,9 @@ async def convert_playlist(apple_music_playlist_url:str,playlist_name:str,descri
 
 
 
-@router.get("/status/{task_id")
+@router.get("/status/{task_id}")
 def get_status(task_id:str):
-    task = AsyncResult(task_id)
+    task = convert.AsyncResult(task_id)
 
     return {
         "state":task.state,
