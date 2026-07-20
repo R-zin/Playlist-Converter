@@ -1,1 +1,6 @@
 .env
+.claude
+dump.rdb
+
+# superdesign temp design files
+.superdesign/tmp/

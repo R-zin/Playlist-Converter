@@ -1,0 +1,137 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@700&f[]=satoshi@500,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f2f2f2;
+  --surface: #ffffff;
+  --ink: #111111;
+  --ink-soft: #1e1e1e;
+  --border: rgba(30, 30, 30, 0.1);
+  --muted: #838282;
+  --muted-2: #b6b5b5;
+  --track: #d9d9d9;
+
+  --pill-border: #1e1e1e;
+  --pill-hover-bg: #1e1e1e;
+  --pill-hover-text: #f2f2f2;
+
+  --footer-bg: #1e1e1e;
+  --easing: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.dark {
+  --bg: #111111;
+  --surface: #1e1e1e;
+  --ink: #f2f2f2;
+  --ink-soft: #f6f6f6;
+  --border: rgba(246, 246, 246, 0.1);
+  --muted: #a8a8a8;
+  --muted-2: #8a8a8a;
+  --track: #2a2a2a;
+
+  --pill-border: #f6f6f6;
+  --pill-hover-bg: #f6f6f6;
+  --pill-hover-text: #111111;
+
+  --footer-bg: #0a0a0a;
+}
+
+html {
+  background-color: var(--bg);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 300ms var(--easing), color 300ms var(--easing);
+}
+
+.clash {
+  font-family: 'Clash Display', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.hero-title {
+  font-size: clamp(48px, 11vw, 180px);
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+/* Primary pill button — inverts on hover in both themes */
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--pill-border);
+  border-radius: 9999px;
+  color: var(--ink);
+  background-color: transparent;
+  transition: all 120ms var(--easing);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+}
+.pill-button:hover:not(:disabled) {
+  background-color: var(--pill-hover-bg);
+  color: var(--pill-hover-text);
+  transform: scale(1.05);
+}
+.pill-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.satoshi-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* Underline text field used on the converter/admin forms */
+.field {
+  width: 100%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.125rem;
+  padding: 0.25rem 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  outline: none;
+  transition: border-color 120ms var(--easing);
+}
+.field::placeholder {
+  color: var(--muted-2);
+}
+.field:focus {
+  border-bottom-color: var(--ink-soft);
+}
+
+.reveal {
+  animation: reveal-up 700ms var(--easing) forwards;
+  opacity: 0;
+}
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 250ms; }
+.stagger-3 { animation-delay: 400ms; }
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; opacity: 1; }
+  .pill-button:hover:not(:disabled) { transform: none; }
+}
