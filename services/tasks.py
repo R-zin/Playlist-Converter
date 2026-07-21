@@ -36,7 +36,7 @@ async def get_new_access_token(refresh_token:str):
 async def convert_playlist_async(apple_music_playlist_url:str,playlist_name:str,description:str):
     db = SessionLocal()
     try:
-        apple_playlist = appleParser.parse_playlist_meta(apple_music_playlist_url)
+        apple_playlist = await appleParser.parse_playlist_meta(apple_music_playlist_url)
         admin = db.query(SpotifyAdmin).first()
         if not admin:
             raise HTTPException(status_code=404, detail="Admin not found")
@@ -48,7 +48,7 @@ async def convert_playlist_async(apple_music_playlist_url:str,playlist_name:str,
             db.commit()
         else:
             token = admin.access_token
-        res = spotify.create_playlist(token=str(token), playlist_name=playlist_name, songs=apple_playlist.songs,
+        res = await spotify.create_playlist(token=str(token), playlist_name=playlist_name, songs=apple_playlist.songs,
                                       description=description)
         entry = SpotifyPlaylist(id=str(uuid4()), playlist_name=playlist_name, trackno=len(apple_playlist.songs),
                                 playlist_link=res, song_list=apple_playlist.songs)
@@ -63,7 +63,7 @@ async def convert_playlist_async(apple_music_playlist_url:str,playlist_name:str,
     finally:
         db.close()
 
-@celery.task()
+@celery.task
 def convert(apple_music_playlist_url,playlist_name,description):
     return asyncio.run(convert_playlist_async(apple_music_playlist_url,playlist_name,description))
 
