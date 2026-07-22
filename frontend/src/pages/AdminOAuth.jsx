@@ -19,6 +19,7 @@ export default function AdminOAuth() {
     try {
       const data = await getAuthorizationUrl(adminKey.trim())
       if (!data.authorization_url) throw new Error('No authorization URL returned.')
+      console.log(data.authorization_url)
       setAuthUrl(data.authorization_url)
     } catch (err) {
       setError(err.message || 'Could not start Spotify authorization.')

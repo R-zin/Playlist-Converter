@@ -12,7 +12,7 @@ import base64
 import urllib.parse
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
+REDIRECT_URL = os.getenv("REDIRECT_URL")
 SCOPES = {
     "playlist-modify-public":"Modify playlist",
     "playlist-modify-private": "modify private playlist",
@@ -37,7 +37,7 @@ async def spotify_login(admin:bool = Depends(verify_admin)):
         "response_type": 'code',
       "client_id": CLIENT_ID,
       "scope": " ".join(SCOPES.keys()),
-      "redirect_uri": REDIRECT_URI,
+      "redirect_uri": REDIRECT_URL,
     }
     auth_url = (
         f"{SPOTIFY_AUTH_URL}?"
@@ -60,7 +60,7 @@ async def spotify_callback(code:str):
                 data={
                     "grant_type":"authorization_code",
                     "code":code,
-                    "redirect_uri":REDIRECT_URI
+                    "redirect_uri":REDIRECT_URL
                 },
                 headers={
                     "Authorization": f"Basic {auth_head}",
